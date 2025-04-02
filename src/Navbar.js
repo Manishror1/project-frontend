@@ -6,20 +6,20 @@ import { FaUserCircle } from 'react-icons/fa';
 const AppNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  // ❌ Don't show navbar on login/register/home
+  // ❌ Hide navbar on login, register, or home
   if (
-    location.pathname === "/login" ||
-    location.pathname === "/register" ||
-    location.pathname === "/"
+    location.pathname === '/login' ||
+    location.pathname === '/register' ||
+    location.pathname === '/'
   ) {
     return null;
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   return (
@@ -31,19 +31,24 @@ const AppNavbar = () => {
     >
       <Container fluid>
         <Navbar.Brand as={Link} to="/" className="fw-bold text-white">
-        QuizChamp🧠
+          QuizChamp 🧠
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="navbar-nav" />
         <Navbar.Collapse id="navbar-nav">
           <Nav className="mx-auto">
-            <Nav.Link as={Link} to="/player" className="text-white mx-2">
-              Play Quiz
+            <Nav.Link as={Link} to="/" className="text-white mx-2">
+              Home
+            </Nav.Link>
+            <Nav.Link
+              as={Link} to='/player' className="text-white mx-2"
+            >
+         Quizes
             </Nav.Link>
             <Nav.Link as={Link} to="/scoreboard" className="text-white mx-2">
               Leaderboard
             </Nav.Link>
-            <Nav.Link as={Link} to="/scoreboard" className="text-white mx-2">
+            <Nav.Link as={Link} to="/score-history" className="text-white mx-2">
               Score History
             </Nav.Link>
           </Nav>
