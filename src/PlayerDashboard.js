@@ -24,7 +24,11 @@ const PlayerDashboard = () => {
 
   const loadQuizzes = async () => {
     const data = await getAllQuizzes();
-    setQuizzes(data);
+    // Sort quizzes by startDate (ascending)
+    const sorted = [...data].sort(
+      (a, b) => new Date(a.startDate) - new Date(b.startDate)
+    );
+    setQuizzes(sorted);
   };
 
   const loadLikedQuizzes = async () => {
@@ -51,6 +55,17 @@ const PlayerDashboard = () => {
     });
   };
 
+  const getStatusBadge = (start, end) => {
+    const now = new Date();
+    if (now < start) {
+      return <Badge bg="info">Upcoming</Badge>;
+    } else if (now >= start && now <= end) {
+      return <Badge bg="success">Ongoing</Badge>;
+    } else {
+      return <Badge bg="danger">Ended</Badge>;
+    }
+  };
+
   return (
     <Container className="mt-4">
       <p className="lead">Welcome back, {user?.firstName}!</p>
@@ -59,18 +74,19 @@ const PlayerDashboard = () => {
         <thead className="table-dark">
           <tr>
             <th>ID</th>
-            <th>Title & Availability</th>
+            <th>Title & Dates</th>
             <th>Category</th>
             <th>Difficulty</th>
+            <th>Status</th>
             <th>Play</th>
             <th>Like</th>
           </tr>
         </thead>
         <tbody>
           {quizzes.map((quiz) => {
-            const now = new Date();
             const start = new Date(quiz.startDate);
             const end = new Date(quiz.endDate);
+            const now = new Date();
             const isAvailable = now >= start && now <= end;
 
             return (
@@ -79,23 +95,20 @@ const PlayerDashboard = () => {
                 <td>
                   <strong>{quiz.title}</strong>
                   <br />
-                  <Badge bg={isAvailable ? 'success' : 'secondary'} className="mt-1">
-                    {isAvailable ? 'Available Now' : 'Unavailable'}
-                  </Badge>
-                  <br />
                   <small>
                     {quiz.startDate} ➜ {quiz.endDate}
                   </small>
                 </td>
                 <td>{quiz.category}</td>
                 <td>{quiz.difficulty}</td>
+                <td>{getStatusBadge(start, end)}</td>
                 <td>
                   <Button
                     variant={isAvailable ? 'success' : 'secondary'}
                     onClick={() => handlePlayQuiz(quiz.id)}
                     disabled={!isAvailable}
                   >
-                    {isAvailable ? 'Play Quiz' : 'Not Available'}
+                    {isAvailable ? 'Play' : 'Unavailable'}
                   </Button>
                 </td>
                 <td>
