@@ -7,7 +7,10 @@ import {
   Form,
   Alert,
   Row,
-  Col
+  Col,
+  ToggleButtonGroup,
+  ToggleButton,
+  Badge
 } from 'react-bootstrap';
 import {
   getAllQuizzes,
@@ -21,6 +24,7 @@ const AdminDashboard = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [users, setUsers] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [theme, setTheme] = useState('light');
   const [quizForm, setQuizForm] = useState({
     id: null,
     title: '',
@@ -146,18 +150,41 @@ const AdminDashboard = () => {
     }
   };
 
+  const darkStyle = theme === 'dark' ? {
+    backgroundColor: '#1e1e1e',
+    color: '#ffffff',
+    transition: 'background 0.5s ease'
+  } : {};
+
   return (
-    <Container className="mt-4">
-      <h2>Admin Dashboard - Manage Quizzes</h2>
+    <Container style={{ marginTop: '30px', animation: 'fadeIn 0.7s ease-in-out', ...darkStyle }}>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 style={{ color: theme === 'dark' ? '#ffffff' : '#2c3e50' }}>Admin Dashboard - Manage Quizzes</h2>
+        <ToggleButtonGroup type="radio" name="theme" value={theme} onChange={val => setTheme(val)}>
+          <ToggleButton id="t1" variant="outline-dark" value={'light'}>☀️ Light</ToggleButton>
+          <ToggleButton id="t2" variant="outline-light" value={'dark'}>🌙 Dark</ToggleButton>
+        </ToggleButtonGroup>
+      </div>
+
       {error && <Alert variant="danger">{error}</Alert>}
       {success && <Alert variant="success">{success}</Alert>}
 
-      <Button className="mb-3" onClick={() => handleShowModal()}>
-        Add New Quiz
+      <Button
+        style={{ backgroundColor: '#5c6bc0', border: 'none', marginBottom: '20px', boxShadow: '0 4px 10px rgba(0,0,0,0.15)' }}
+        onClick={() => handleShowModal()}
+      >
+        ➕ Add New Quiz
       </Button>
 
-      <Table striped bordered hover>
-        <thead>
+      <Table bordered hover responsive style={{ backgroundColor: theme === 'dark' ? '#2c3e50' : '#ffffff', borderRadius: '10px', overflow: 'hidden', color: theme === 'dark' ? '#ecf0f1' : 'black' }}>
+        <thead style={{ backgroundColor: theme === 'dark' ? '#1abc9c' : '#34495e', color: 'white' }}>
           <tr>
             <th>ID</th>
             <th>Title</th>
@@ -172,7 +199,7 @@ const AdminDashboard = () => {
         </thead>
         <tbody>
           {quizzes.map((quiz) => (
-            <tr key={quiz.id}>
+            <tr key={quiz.id} style={{ transition: 'all 0.3s ease', cursor: 'pointer' }}>
               <td>{quiz.id}</td>
               <td>{quiz.title}</td>
               <td>{quiz.category}</td>
@@ -183,10 +210,10 @@ const AdminDashboard = () => {
               <td>{quiz.likes}</td>
               <td>
                 <Button variant="info" onClick={() => handleShowModal(quiz)} className="me-2">
-                  Edit
+                  ✏️ Edit
                 </Button>
                 <Button variant="danger" onClick={() => handleDelete(quiz.id)}>
-                  Delete
+                  ❌ Delete
                 </Button>
               </td>
             </tr>
@@ -194,7 +221,7 @@ const AdminDashboard = () => {
         </tbody>
       </Table>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={handleCloseModal} centered animation>
         <Modal.Header closeButton>
           <Modal.Title>{quizForm.id ? 'Edit Quiz' : 'Create Quiz'}</Modal.Title>
         </Modal.Header>
@@ -226,15 +253,15 @@ const AdminDashboard = () => {
                 <Form.Control type="date" name="endDate" value={quizForm.endDate} onChange={handleChange} />
               </Col>
             </Row>
-            <Button className="mt-3" variant="primary" onClick={handleSave}>Save</Button>
+            <Button className="mt-3" variant="primary" onClick={handleSave} style={{ width: '100%' }}>💾 Save</Button>
           </Form>
         </Modal.Body>
       </Modal>
 
       <hr className="my-4" />
-      <h4>Manage Users</h4>
-      <Table striped bordered hover>
-        <thead>
+      <h4 style={{ color: theme === 'dark' ? '#ffffff' : '#2c3e50', marginTop: '40px' }}>Manage Users</h4>
+      <Table striped bordered hover responsive style={{ backgroundColor: theme === 'dark' ? '#2c3e50' : '#ffffff', borderRadius: '8px', color: theme === 'dark' ? '#ffffff' : 'black' }}>
+        <thead style={{ backgroundColor: theme === 'dark' ? '#1abc9c' : '#2c3e50', color: '#fff' }}>
           <tr>
             <th>User ID</th>
             <th>Username</th>
@@ -246,17 +273,17 @@ const AdminDashboard = () => {
         </thead>
         <tbody>
           {users.map((u) => (
-            <tr key={u.id}>
+            <tr key={u.id} style={{ transition: 'background-color 0.3s ease' }}>
               <td>{u.id}</td>
               <td>{u.username}</td>
               <td>{u.email}</td>
               <td>{u.firstName} {u.lastName}</td>
-              <td>{u.role}</td>
+              <td><Badge bg={u.role === 'ADMIN' ? 'primary' : 'secondary'}>{u.role}</Badge></td>
               <td>
                 <Form.Select
                   value={u.role}
                   onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                  style={{ maxWidth: '150px' }}
+                  style={{ maxWidth: '150px', backgroundColor: theme === 'dark' ? '#34495e' : '#ecf0f1', color: theme === 'dark' ? 'white' : 'black' }}
                 >
                   <option value="PLAYER">PLAYER</option>
                   <option value="ADMIN">ADMIN</option>
